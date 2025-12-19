@@ -1,0 +1,22 @@
+Implement Search and Filter in ProductList.razor.
+
+Pagination for product list.
+
+Sorting Columns (e.g., by Price, Name).
+
+Role-based Authentication (Admin/User).
+
+Real-time update with SignalR.
+
+Upload Image with Product.
+
+Export to Excel/PDF.
+
+Client-side form validation with custom messages.
+
+Modal dialog for Create/Edit using Blazored.Modal.
+
+Use Repository Pattern + Service Layer (Clean Architecture).
+
+note: jumb to another page
+migration issues ----not found project

@@ -1,0 +1,73 @@
+
+<!-- ✅ Search Section -->
+<div class="search-container">
+  <input 
+    type="text" 
+    [(ngModel)]="query" 
+    placeholder="Search files..." 
+    class="search-input"
+  />
+
+  <button class="search-btn" (click)="search()">Search</button>
+</div>
+
+<!-- ✅ Loading -->
+@if (loading) {
+  <div class="loading">Loading...</div>
+}
+
+<!-- ✅ Files Found -->
+@if (!loading && files.length > 0) {
+  <table class="file-table">
+
+
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Content Type</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (f of files; track f.id) {
+        <tr>
+          <td>{{ f.name }}</td>
+          <td>{{ f.size }} bytes</td>
+          <td>{{ f.contentType }}</td>
+          <td>{{ f.createdAt | date:'short' }}</td>
+          <td>
+            <button (click)="download(f)">Download</button>
+            <button (click)="preview(f.id)">Preview</button>
+            <button (click)="softDelete(f.id)">Soft Delete</button>
+
+            @if (isAdmin) {
+              <button (click)="hardDelete(f.id)">Hard Delete</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+
+  </table>
+
+  <!-- ✅ Pagination -->
+  <div class="pagination" style="margin-top: 20px;">
+    <button (click)="prevPage()" [disabled]="page === 1">Previous</button>
+
+    <span style="margin: 0 10px;">
+      Page {{ page }} of {{ totalPages }} (Total: {{ totalCount }})
+    </span>
+
+    <button (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+  </div>
+}
+
+<!-- ✅ No Files -->
+@if (!loading && files.length === 0) {
+  <p>No files found.</p>
+}
+
+ 

@@ -1,0 +1,83 @@
+
+<div class="upload-wrapper">
+  <div class="upload-card">
+
+    <img src="assets/flora-logo.png" alt="Flora Group Logo" class="logo" />
+
+    <h2>Upload File</h2>
+    <p class="subtitle">Select a file and add optional tags</p>
+
+    <!-- ✅ Drag & Drop Zone -->
+    <div 
+      class="drop-zone"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      [class.dragging]="isDragging"
+    >
+      <p>Drag & Drop file here</p>
+      <p>or</p>
+      <p>Click below to select</p>
+    </div>
+
+    <!-- ✅ File Input -->
+    <input type="file" (change)="onFileSelected($event)" class="file-input" />
+
+    <!-- ✅ Tags Input -->
+    <input
+      type="text"
+      placeholder="Tags (optional)"
+      [(ngModel)]="tags"
+      class="tag-input"
+    />
+
+    <!-- ✅ Upload Button -->
+    <button class="upload-btn" (click)="uploadFile()">
+      Upload
+    </button>
+
+    <!-- ✅ Progress Bar -->
+    <div *ngIf="progress > 0" class="progress-bar">
+      <div class="progress" [style.width.%]="progress"></div>
+    </div>
+
+    <!-- ✅ Message -->
+    <p *ngIf="message" class="message">{{ message }}</p>
+
+  </div>
+</div>
+
+<!-- <div class="upload-wrapper">
+  <div class="upload-card">
+
+    <img src="assets/flora-logo.png" alt="Flora Group Logo" class="logo" />
+
+    <h2>Upload File</h2>
+    <p class="subtitle">Select a file and add optional tags</p>
+
+    <!-- ✅ File Input -->
+    <!--<input type="file" (change)="onFileSelected($event)" class="file-input" />
+
+    <!-- ✅ Tags Input -->
+   <!-- <input
+      type="text"
+      placeholder="Tags (optional)"
+      [(ngModel)]="tags"
+      class="tag-input"
+    />
+
+    <!-- ✅ Upload Button -->
+   <!-- <button class="upload-btn" (click)="uploadFile()">
+      Upload
+    </button>
+
+    <!-- ✅ Progress Bar -->
+   <!-- <div *ngIf="progress > 0" class="progress-bar">
+      <div class="progress" [style.width.%]="progress"></div>
+    </div>
+
+    <!-- ✅ Message -->
+   <!-- <p *ngIf="message" class="message">{{ message }}</p>-->
+
+ <!-- </div>-->
+<!--</div>-->

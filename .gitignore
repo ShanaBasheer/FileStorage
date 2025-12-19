@@ -1,0 +1,12 @@
+# Visual Studio cache
+.vs/
+
+# Build outputs
+bin/
+obj/
+
+# Node modules
+file-storage-ui/node_modules/
+
+# Logs
+*.log
