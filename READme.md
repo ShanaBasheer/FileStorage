@@ -17,6 +17,23 @@ A secure, streaming‑based file storage system built with ASP.NET Core and Angu
 - E2E test (Cypress)
 This README explains how to run the entire project, the architecture, design decisions, limitations, and future enhancements.
 
+# Evaluator Quick Start
+
+Clone the repo and run these commands:
+# Backend
+cd src/Api
+dotnet ef database update
+dotnet run
+
+FrondEnd
+cd src/file-storage-ui
+npm install
+ng serve
+
+Access UI
+Open browser → http://localhost:4200
+
+
 1. Project Structure
 1. 
 FileStorage/
