@@ -1,31 +1,22 @@
-import { Injectable } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const token = auth.getToken();
-
-  if (!token) {
-    return router.parseUrl('/login');  // ✅ correct redirect
+  if (typeof window === 'undefined') {
+    return false;
   }
 
-  return true;
+  const token = auth.getToken();
+
+  if (token) {
+    return true;
+  }
+
+  // No token → redirect to login
+  router.navigate(['/login']);
+  return false;
 };
-
-
-// export const authGuard: CanActivateFn = () => {
-//   const auth = inject(AuthService);
-//   const router = inject(Router);
-
-//   const token = auth.getToken();
-//   if (token) {
-//     return true; // ✅ allow access
-//   } else {
-//     router.navigate(['/login']); // ✅ redirect if not logged in
-//     return false;
-//   }
-// };

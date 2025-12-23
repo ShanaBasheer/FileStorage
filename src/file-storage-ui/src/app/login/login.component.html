@@ -1,40 +1,16 @@
-<!--<div class="login-wrapper">
-  <!-- <div class="login-card"> -->
-    
-      <!--<img src="assets/flora-logo.png" alt="Flora Group Logo" class="logo" />
 
-    <h2>Welcome to Flora Group</h2>
-    <p class="subtitle">Please sign in to continue</p>
-
-    <form (ngSubmit)="login()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input [(ngModel)]="username" name="username" id="username" placeholder="Enter username" required />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input [(ngModel)]="password" name="password" id="password" type="password" placeholder="Enter password" required />
-      </div>
-
-      <button type="submit" class="btn-login">Login</button>
-    </form>
-
-    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
-  </div>
-</div>-->
 <div class="login-wrapper">
   <div class="login-card">
-    <!-- 🌿 Company Logo -->
-    <img src="assets/logo.png" alt="Flora Group Logo" class="logo" />
+    <!--   Logo -->
+    <img src="/assets/FLORA.png" alt="Flora Group Logo" class="logo" /> 
 
-    <h2>Welcome to Flora Group</h2>
+    <h2>Welcome to Flora Technology</h2>
     <p class="subtitle">Please sign in to continue</p>
 
     <form (ngSubmit)="login()">
       <div class="form-group">
         <label for="username">Username</label> 
-        <input [(ngModel)]="username" name="username" id="username" placeholder="Enter username" required />
+        <input [(ngModel)]="user" name="username" id="username" placeholder="Enter username" required />
       </div>
 
       <div class="form-group">

@@ -18,6 +18,7 @@ using System.Text;
  
 
 var builder = WebApplication.CreateBuilder(args);
+Log.Information("Application Starting. Environment: {Environment}", builder.Environment.EnvironmentName);
  
 builder.Services.AddCors(options =>
 {
@@ -179,7 +180,45 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddControllers();
 
 var app = builder.Build();
- 
+
+// Automatically apply migrations at startup ONLY in Docker
+if (app.Environment.IsEnvironment("Docker"))
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<AppDbContext>();
+        
+        Log.Information("Docker environment detected. Starting migration retry loop...");
+
+        int retries = 10;
+        int delaySeconds = 5;
+        bool success = false;
+
+        for (int i = 1; i <= retries; i++)
+        {
+            try
+            {
+                Log.Information("Migration attempt {Attempt} of {Total}...", i, retries);
+                context.Database.Migrate();
+                Log.Information("Database migrated successfully (Docker Environment).");
+                success = true;
+                break;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning("Migration attempt {Attempt} failed: {Message}. Retrying in {Delay}s...", i, ex.Message, delaySeconds);
+                await Task.Delay(delaySeconds * 1000);
+            }
+        }
+
+        if (!success)
+        {
+            Log.Error("Could not migrate database after {Total} attempts. Continuing without migration...", retries);
+        }
+    }
+}
+
 app.UseRouting();
 app.UseCors("_myAllowSpecificOrigins");
 app.UseAuthentication();

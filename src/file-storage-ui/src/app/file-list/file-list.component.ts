@@ -1,236 +1,274 @@
-
-import { Component, inject, OnInit } from '@angular/core';
+ import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, DatePipe } from '@angular/common';
-import { StorageService } from '../storage/storage.service';
-import { Router, NavigationEnd } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { UploadComponent } from '../upload/upload.component';
+
+interface FileItem {
+  id: string;
+  originalName: string;
+  sizeBytes: number;
+  contentType: string;
+  createdAtUtc: string;
+  tags?: string;
+}
 
 @Component({
-  selector: 'app-file-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  selector: 'app-file-list',
+  imports: [CommonModule, FormsModule, UploadComponent   
+],
   templateUrl: './file-list.component.html',
-  styleUrls: ['./file-list.component.css']
+  styleUrls: ['./file-list.component.css'],
+  
 })
 export class FileListComponent implements OnInit {
 
-  private storage = inject(StorageService);
-  private router = inject(Router);
+  role: string = '';
 
-  query = '';
-  files: any[] = [];
-  loading = false;
-  isAdmin = false;
+  // DATA
+  files: FileItem[] = [];
+  filteredFiles: FileItem[] = [];
 
-  page = 1;
+  // FILTERS
+  nameFilter = '';
+contentTypeFilter = "";
+fromDate = "";
+toDate = "";
+
+  // PAGINATION
+  currentPage = 1;
   pageSize = 10;
-  totalPages = 0;
-  totalCount = 0;
+  totalPages = 1;
 
-  ngOnInit() {
-    const role = localStorage.getItem('role');
-    this.isAdmin = role === 'Admin';
+  private apiBase = 'http://localhost:5015/api/files';
 
-    // ✅ Load files ONLY after navigation is fully completed
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        if (localStorage.getItem('token')) {
-          this.loadFiles();
-        }
-      }
-    });
+ constructor(
+  private http: HttpClient,
+  private cdr: ChangeDetectorRef,
+  private sanitizer: DomSanitizer
+) {}
+
+ngOnInit(): void {
+    this.role = (localStorage.getItem('role') || '').toLowerCase();
+    console.log("ROLE LOADED:", this.role);
+   this.loadFiles();
   }
+  // isLoading = false;
 
-  loadFiles() {
-    this.loading = true;
+// BACKEND PAGINATION + FILTERS
+loadFiles(): void {
+    // this.isLoading = true;
 
-    this.storage.getPagedFiles(this.page, this.pageSize).subscribe({
-      next: (res) => {
-        this.files = res.items;
-        this.totalPages = res.totalPages;
-        this.totalCount = res.totalCount;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error("Error:", err);
-        this.loading = false;
-      }
-    });
-  }
 
-  nextPage() {
-    if (this.page < this.totalPages) {
-      this.page++;
-      this.loadFiles();
-    }
-  }
+  const url =
+    `${this.apiBase}?page=${this.currentPage}` +
+    `&pageSize=${this.pageSize}` +
+    `&search=${this.nameFilter || ''}` +
+    `&type=${this.contentTypeFilter || ''}` +
+    `&fromDate=${this.fromDate || ''}` +
+    `&toDate=${this.toDate || ''}`;
 
-  prevPage() {
-    if (this.page > 1) {
-      this.page--;
-      this.loadFiles();
-    }
-  }
+  this.http.get<any>(url).subscribe({
+    next: res => {
+      console.log("FILES RESPONSE:", res);
 
-  search() {
-    this.loading = true;
+      this.filteredFiles = res.items || [];
+      this.totalPages = Math.ceil(res.total / this.pageSize);
 
-    this.storage.list(this.query).subscribe({
-      next: (res) => {
-        this.files = res;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error("Error:", err);
-        this.loading = false;
-      }
-    });
-  }
-
-  download(file: any) {
-    this.storage.download(file.id).subscribe((blob: Blob) => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  }
-
-  preview(id: string) {
-    this.storage.preview(id).subscribe((blob: Blob) => {
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    });
-  }
-
-  softDelete(id: string) {
-    this.storage.softDelete(id).subscribe(() => this.loadFiles());
-  }
-
-  hardDelete(id: string) {
-    this.storage.hardDelete(id).subscribe(() => this.loadFiles());
-  }
+      this.cdr.detectChanges();   //  FIX 
+    },
+    error: err => console.error(err)
+  });
 }
 
 
 
-// import { Component, inject, OnInit } from '@angular/core';
-// import { FormsModule } from '@angular/forms';
-// import { CommonModule, DatePipe } from '@angular/common';
-// import { StorageService } from '../storage/storage.service';
-// import { Router, NavigationEnd } from '@angular/router';
-// import { ChangeDetectorRef } from '@angular/core';
+resetFilters(): void {
+  this.nameFilter = "";
+  this.contentTypeFilter = "";
+  this.fromDate = "";
+  this.toDate = "";
+  this.currentPage = 1;
+  this.loadFiles();
+}
+
+  // //  BACKEND PAGINATION + FILTERS
+  // loadFiles(): void {
+  //   const params = new URLSearchParams({
+  //     page: this.currentPage.toString(),
+  //     pageSize: this.pageSize.toString(),
+  //     search: this.nameFilter || ''
+  //   });
+
+  //   this.http.get<any>(`${this.apiBase}?${params.toString()}`).subscribe({
+  //     next: res => {
+  //       this.filteredFiles = res.items || [];
+  //       this.totalPages = Math.ceil(res.total / this.pageSize);
+  //     },
+  //     error: err => console.error(err)
+  //   });
+  // }
+
+  //  FILTER TRIGGER
+applyFilters(): void {
+  this.currentPage = 1;
+  this.loadFiles();
+} 
+
+goToPage(page: number) {
+  setTimeout(() => {
+    this.currentPage = page;
+    this.loadFiles();
+  });
+}
+
+nextPage() {
+  setTimeout(() => {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadFiles();
+    }
+  });
+}
+
+prevPage() {
+  setTimeout(() => {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadFiles();
+    }
+  });
+}
+closePdf() {
+  this.pdfUrl = null;
+  this.cdr.detectChanges(); // ensures modal closes instantly
+}
+
+showToast(message: string) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+
+  toast.innerText = message;
+  toast.classList.add('show');
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
+pdfUrl: SafeResourceUrl | null = null;
+
+// inline preview
+previewFile(file: FileItem): void {
+  const url = `${this.apiBase}/${file.id}/preview?download=true`;
+
+  this.http.get(url, { responseType: 'blob' }).subscribe({
+    next: blob => {
+      const objectUrl = URL.createObjectURL(blob);
+
+      setTimeout(() => {
+        this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+        this.cdr.detectChanges();
+      });
+    },
+    error: err => console.error(err)
+  });
+}
 
 
-// @Component({
-//   selector: 'app-file-list',
-//   standalone: true,
-//   imports: [CommonModule, FormsModule, DatePipe],
-//   templateUrl: './file-list.component.html',
-//   styleUrls: ['./file-list.component.css']
-// })
-// export class FileListComponent implements OnInit {
-// private cdr = inject(ChangeDetectorRef);
 
-//   private router = inject(Router);
-//   private storage = inject(StorageService);
 
-//   query = '';          // ✅ search text
-//   files: any[] = [];
-//   loading = false;
-//   isAdmin = false;
-//   page = 1;
-//   pageSize = 10;totalPages = 0;totalCount = 0;
+//hust commet for checking above code
+//  pdfUrl: any = null;
+// previewFile(file: FileItem): void {
+//   if (file.contentType.includes('pdf') || file.contentType.includes('image')) {
+//     // inline preview
+//     const url = `${this.apiBase}/${file.id}/preview`;
 
-//   ngOnInit() {
-//   const role = localStorage.getItem('role');
-//   this.isAdmin = role === 'Admin';
-
-//   // ✅ Load files ONLY after navigation is fully completed
-//   this.router.events.subscribe(event => {
-//     if (event instanceof NavigationEnd) {
-//       if (localStorage.getItem('token')) {
-//         this.loadFiles();
+//     this.http.get(url, { responseType: 'blob' }).subscribe({
+//       next: blob => {
+//         const objectUrl = URL.createObjectURL(blob);
+//         this.pdfUrl = objectUrl; // inline modal
 //       }
+//     });
+//   } else {
+//     // fallback → open in new tab or download
+//     this.downloadFile(file);
+//   }
+// }
+
+
+// previewFile(file: FileItem): void {
+//   const url = `${this.apiBase}/${file.id}/preview`;
+
+//   this.http.get(url, { responseType: 'blob' }).subscribe({
+//     next: blob => {
+//       const objectUrl = URL.createObjectURL(blob);
+//       this.pdfUrl = objectUrl;
 //     }
 //   });
 // }
 
-
-//   loadFiles() {
-//     this.loading = true;
-//     this.storage.getPagedFiles(this.page, this.pageSize).subscribe({
-//       next: (res) => {
-//         this.files = res.items;
-//         this.totalPages = res.totalPages;
-//         this.totalCount = res.totalCount;
-//         this.loading = false;
-//         this.cdr.detectChanges();   // ✅ Force UI refresh
-
-//       },
-//       error: (err) => {
-//         console.error("Error:", err);
-//         this.loading = false;
-//       }
-//     });
-//   }
-//   nextPage() {
-//     if (this.page < this.totalPages) {
-//       this.page++;
-//       this.loadFiles();
-//     }
-//   }
-
-//   prevPage() {
-//     if (this.page > 1) {
-//       this.page--;
-//       this.loadFiles();
-//     }
-//   }
-//   // ✅ Search function
-//   search() {
-//     this.loading = true;
-
-//     this.storage.list(this.query).subscribe({
-//       next: (res) => {
-//         this.files = res;
-//         this.loading = false;
-//       },
-//       error: (err) => {
-//         console.error("Error:", err);
-//         this.loading = false;
-//       }
-//     });
-//   }
-
-//   download(file: any) {
-//     this.storage.download(file.id).subscribe((blob: Blob) => {
-//       const url = URL.createObjectURL(blob);
-//       const a = document.createElement('a');
-//       a.href = url;
-//       a.download = file.name;
-//       a.click();
-//       URL.revokeObjectURL(url);
-//     });
-//   }
-
-//   preview(id: string) {
-//     this.storage.preview(id).subscribe((blob: Blob) => {
-//       const url = URL.createObjectURL(blob);
-//       window.open(url, '_blank');
-//     });
-//   }
-
-//   softDelete(id: string) {
-//     this.storage.softDelete(id).subscribe(() => this.search());
-//   }
-
-//   hardDelete(id: string) {
-//     this.storage.hardDelete(id).subscribe(() => this.search());
-//   }
-
-
-
+// closePdf() {
+//   this.pdfUrl = null;
 // }
+
+
+  // // EXISTING FUNCTIONS (unchanged)
+  // previewFile(file: FileItem): void {
+  //   const url = `${this.apiBase}/${file.id}/preview`;
+
+  //   this.http.get(url, { responseType: 'blob' }).subscribe({
+  //     next: blob => {
+  //       const objectUrl = URL.createObjectURL(blob);
+  //       window.open(objectUrl, '_blank');
+  //     }
+  //   });
+  // }
+
+  downloadFile(file: FileItem): void {
+    const url = `${this.apiBase}/${file.id}/download`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: blob => {
+        const a = document.createElement('a');
+        const objectUrl = URL.createObjectURL(blob);
+        a.href = objectUrl;
+        a.download = file.originalName;
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      },
+      error: err => console.error('Error downloading file', err)
+    });
+  }
+
+  softDeleteFile(file: FileItem): void {
+    const url = `${this.apiBase}/${file.id}`;
+
+    this.http.delete(url).subscribe({
+      next: () => {
+        this.loadFiles();
+        this.showToast(`${file.originalName} soft deleted successfully`);
+
+        
+      },
+      error: err => console.error('Error soft deleting file', err)
+    });
+  }
+
+  hardDeleteFile(file: FileItem): void {
+    const url = `${this.apiBase}/${file.id}/hard`;
+     if (!confirm(`Permanently delete ${file.originalName}?`)) return;
+
+    this.http.delete(url).subscribe({
+      next: () => {
+        this.loadFiles();
+        this.showToast(`${file.originalName} permanently deleted`);
+      
+      },
+      error: err => console.error('Error hard deleting file', err)
+    });
+  }
+}

@@ -1,0 +1,30 @@
+<!-- <label>Logout</label> -->
+<div class="logout-icon" (click)="logout()">
+  🚪
+</div>
+
+<div class="home-container">
+
+  <div class="welcome-box">
+    <h2>Welcome, {{ userName }}</h2>
+    <p class="role">Role: {{ userRole }}</p>
+  </div>
+
+  <div class="action-buttons">
+
+    <button class="btn" (click)="router.navigate(['/file-list'])">
+  📁 View Files
+</button>
+
+
+    <button class="btn" routerLink="/upload">
+      ⬆️ Upload File
+    </button>
+
+    <button *ngIf="userRole === 'admin'" class="btn admin" routerLink="/admin">
+      🔐 Admin Panel
+    </button>
+
+  </div>
+
+</div>

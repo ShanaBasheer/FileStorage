@@ -40,8 +40,10 @@
     "@angular/build": "^21.0.2",
     "@angular/cli": "^21.0.2",
     "@angular/compiler-cli": "^21.0.0",
+    "@types/cypress": "^0.1.6",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "cypress": "^15.7.1",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

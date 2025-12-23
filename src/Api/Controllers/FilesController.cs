@@ -29,7 +29,7 @@ public class FilesController : ControllerBase
     // CancellationToken ct)
     [HttpPost("upload")]
     public async Task<IActionResult> Upload(
-    [FromForm] IFormFile file,
+    IFormFile file,
     [FromForm] string? tags,
     CancellationToken ct)
 

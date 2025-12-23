@@ -57,26 +57,21 @@ src/
 - Docker & Docker Compose
 - sqlserver (only if running without Docker)
 
-2.2 Run Entire Project with Docker (Recommended)
+2. Running the Project with Docker (Recommended)
+
 From the project root:
-docker-compose up --build
 
+```bash
+docker-compose up -d --build
+```
+This builds and starts the full solution:
+- **Backend API**: http://localhost:5015
+  - Swagger UI: http://localhost:5015/swagger
+- **Frontend UI**: http://localhost:4200
+- **SQL Server**: localhost:1433  (User: sa / Pass: YourStrong@Password123)
 
-Service   URL
-API       http://localhost:5015
-DB        localhost:1433 (last check)
+Wait a few seconds for SQL Server to initialize. The API will automatically apply database migrations on startup.
 
-Health endpoints:
-- GET /health/live
-- GET /health/ready
-
-
-2.3 Run Backend Locally
-cd src/Api
-dotnet run
-
-Backend runs at:
-http://localhost:5015
 
 2.4 Run Frontend Locally
 cd src/file-storage-ui  ....
@@ -195,27 +190,35 @@ Cypress test covers:
 - File list
 - Download (206 Partial Content)
   Upload tested manually  
+ 
 
-Docker Setup
-1. Install -- Docker Desktop
-Windows 11‑il Docker Desktop install 
-
+ Docker Setup (Recommended)
+1. Install Docker
+- Install Docker Desktop (Windows 11 or later).
+- Ensure both Docker and Docker Compose are available in your terminal.
 2. Run Docker Compose
-Project root‑il:
-1. 
-docker-compose up --build
+From the project root (where docker-compose.yml is located):
+docker compose up -d --build
 
 
-3. Services Available
-
-API         http://localhost:5015
-SQL Server  localhost:1433
-
-
+This builds and starts the full solution:
+- Backend API → http://localhost:5015
+- Swagger UI → http://localhost:5015/swagger
+- Frontend UI → http://localhost:4200
+- SQL Server → localhost:1433
+- User: sa
+- Password: YourStrong@Password123
+👉 Wait a few seconds for SQL Server to initialize. The API will automatically apply database migrations on startup.
+3. Logs & Health Checks
+- View API logs:
+docker logs filestorage_api
+- Health endpoints:
+- Live → http://localhost:5015/health/live
+- Ready → http://localhost:5015/health/ready
 4. Connection Strings
-- Local development: Windows Authentication
-- Docker environment: SQL Authentication (sa + password)..now not working..checking..
-- 
+- Local development → Windows Authentication (configured in appsettings.Development.json).
+- Docker environment → SQL Authentication (sa + password above).
+- If connection fails, check that SQL Server container is running and credentials match docker-compose.yml.
 
 
 

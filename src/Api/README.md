@@ -193,198 +193,34 @@ Path               string           Storage path
 -   Hard Delete
 -   Health Checks
 
-   Backend Status
-Completed by: Shana Basheer PV
 
+ Run with Docker
 
+1. Build the API Image
+From the project root (where your Dockerfile and docker-compose.yml are located):
+docker compose build --no-cache
 
 
+2. Start Containers
+docker compose up -d
 
 
+3. Access Services
+- Backend API → http://localhost:5015
+- Health Checks →
+- Live: http://localhost:5015/health/live
+- Ready: http://localhost:5015/health/ready
+4. Logs
+View API logs:
+docker logs filestorage_api
 
 
+5. Notes
+- SQL Server container must be running (configured in docker-compose.yml).
+- API connects to SQL Server using connection string in appsettings.json.
+- Health checks validate both database connectivity and filesystem read/write.
 
+ Backend Status
 
-
-
-
- Overview
-This backend is a secure file storage service built using ASP.NET Core, supporting:
-- User authentication (JWT)
-- File upload
-- File preview (streaming)
-- File download (with Range support)
-- Soft delete
-- Hard delete (admin only)
-- Pagination, search, filtering
-- Health checks
-- Metadata storage in database
-- File storage in local filesystem
-
-🏗️ Tech Stack
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  | storage/ | 
-|  |  | 
-
-
-
-📁 Project Structure
-Backend/
- ├── Api/
- │    ├── Controllers/
- │    ├── Services/
- │    ├── Models/
- │    ├── DTOs/
- │    ├── storage/   ← uploaded files stored here
- │    └── Program.cs
- └── FileStoreDb (SQL Database)
-
-
-
-🔐 Authentication
-Login
-POST /api/auth/login
-
-
-Body:
-{
-  "username": "admin",
-  "password": "admin123"
-}
-
-
-Response includes:
-- JWT token
-- Role
-- User info
-Use this token in all protected endpoints:
-Authorization: Bearer <token>
-
-
-
-📤 Upload File
-POST /api/files
-
-
-Headers:
-Authorization: Bearer <token>
-
-
-Body (form-data):
-file: <choose file>
-
-
-Response contains metadata:
-- id
-- key
-- originalName
-- sizeBytes
-- contentType
-- checksum
-- createdAtUtc
-- version
-- path
-
-📄 List Files (Paged + Search)
-GET /api/files
-
-
-Query Parameters:
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-
-
-Example:
-GET /api/files?page=1&pageSize=10&search=doc
-
-
-
-👁️ Preview File
-GET /api/files/{id}/preview
-
-
-Streams file content (image, text, pdf, etc.)
-
-⬇️ Download File (Range Supported)
-GET /api/files/{id}/download
-
-
-Headers:
-Authorization: Bearer <token>
-Range: bytes=0-1000
-
-
-Returns:
-- 206 Partial Content
-- File stream
-
-🗑️ Soft Delete
-DELETE /api/files/{id}
-
-
-Effect:
-- DeletedAtUtc set in DB
-- File remains in storage
-- File hidden from list
-
-❌ Hard Delete (Admin Only)
-DELETE /api/files/{id}/hard
-
-
-Effect:
-- File removed from storage
-- Metadata removed from DB
-
-❤️ Health Checks
-Live:
-GET /health/live
-
-
-Ready:
-GET /health/ready
-
-
-Expected:
-Healthy
-
-
-
-🗄️ Database Schema (StoredObjects)
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-|  |  | 
-
-
-
-🧪 Postman Testing Checklist
-- [x] Login
-- [x] Upload
-- [x] List
-- [x] Pagination
-- [x] Search
-- [x] Preview
-- [x] Download (206)
-- [x] Soft Delete
-- [x] Hard Delete
-- [x] Health Checks
-
- Backend Status: COMPLETED BY SHANA BASHEER PV..
  
+Completed by: Shana Basheer PV

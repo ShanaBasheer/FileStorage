@@ -1,25 +1,21 @@
-<!-- Navbar only if logged in -->
-@if (isLoggedIn) {
-  <nav class="navbar">
-    <div class="container">
-      <a class="navbar-brand" routerLink="/">🌿 Flora Group</a>
+<nav class="navbar" *ngIf="isLoggedIn">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/"> Flora Group</a>
 
-      <ul class="nav-links">
-        <li><a routerLink="/file-list">Files</a></li>
-        <li><a routerLink="/upload">Upload</a></li>
-        @if (isAdmin) {
-          <li><a routerLink="/admin">Admin</a></li>
-        }
-      </ul>
+    <ul class="nav-links">
+      <li><a routerLink="/file-list">Files</a></li>
+      <li><a routerLink="/upload">Upload</a></li>
+      <li *ngIf="isAdmin"><a routerLink="/admin">Admin</a></li>
+    </ul>
 
-      <!-- User details + logout -->
-      <div class="user-info">
-        <span class="username">👤 {{ currentUser?.username }}</span>
-        <button class="btn-logout" (click)="logout()">Logout</button>
-      </div>
+    <div class="user-info">
+      <span class="username">👤 {{ currentUser?.username }}</span>
+      <button class="btn-logout" (click)="logout()">Logout</button>
     </div>
-  </nav>
-}
+  </div>
+</nav>
 
-<!-- Page content -->
 <router-outlet></router-outlet>
+
+
+ 

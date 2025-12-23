@@ -25,7 +25,14 @@ export class AppComponent {
       const user = JSON.parse(userData);
       this.currentUser = user;
       this.isAdmin = user?.role === 'Admin';
+ }
+
+    // NEW: Hide navbar on login and home pages
+    const currentUrl = this.router.url;
+    if (currentUrl === '/login' || currentUrl === '/home') {
+      this.isLoggedIn = false;
     }
+
   });
 }
 
